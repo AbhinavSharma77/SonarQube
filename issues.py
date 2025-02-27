@@ -1,51 +1,63 @@
 import os
 import json
-import subprocess  
-import jwt  
-import hashlib
 
-# Hardcoded credentials (Security Vulnerability)
+# Bug: Division by zero
+def divide_numbers(a, b):
+    return a / b  # Potential division by zero error
+
+# Vulnerability: Hardcoded credentials
 USERNAME = "admin"
 PASSWORD = "password123"
 
-# Unused import (Code Smell)
-import math  
+def authenticate(user, pwd):
+    if user == USERNAME and pwd == PASSWORD:  # Security issue: Hardcoded credentials
+        return "Access Granted"
+    else:
+        return "Access Denied"
 
-# Function with potential SQL injection vulnerability
-def authenticate_user(user, password):
-    query = f"SELECT * FROM users WHERE username = '{user}' AND password = '{password}'"  # SQL Injection risk
-    print("Executing query:", query)  
-    return True if user == USERNAME and password == PASSWORD else False
+# Security Hotspot: Use of eval()
+def execute_command(command):
+    return eval(command)  # Dangerous use of eval, can lead to code injection
 
-# Function with division by zero (Bug)
-def divide_numbers(a, b):
-    return a / b  # This will cause a ZeroDivisionError if b=0
+# Code Smell: Unused variable
+def calculate_sum(numbers):
+    total = 0
+    unused_variable = "I am not used"  # This variable is never used
+    for num in numbers:
+        total += num
+    return total
 
-# Function with command injection vulnerability
-def run_system_command(cmd):
-    subprocess.call(cmd, shell=True)  # Dangerous! Allows arbitrary command execution
-
-# Function with Insecure Hashing Algorithm
-def store_password(password):
-    return hashlib.md5(password.encode()).hexdigest()  # MD5 is insecure
-
-# Function using JWT without verification (Security Issue)
-def decode_jwt(token):
-    return jwt.decode(token, options={"verify_signature": False})  # Unverified JWT decoding
-
-# Function with unused variable (Code Smell)
+# Low Test Coverage Potential: Complex function with no tests
 def process_data(data):
-    unused_var = "I am never used"  # Code Smell: Unused variable
-    return json.dumps(data)
+    try:
+        json_data = json.loads(data)  # Code Smell: No error handling
+        return json_data["value"]
+    except Exception as e:
+        print("Error processing data:", e)
 
-# Function with an infinite loop (Bug)
-def infinite_loop():
-    while True:
-        print("This loop never ends!")  # Code Smell
+# Duplications: Duplicate Code
+def duplicate_function1(numbers):
+    total = 0
+    for num in numbers:
+        total += num
+    return total
 
-# Calling functions with intentional issues
-authenticate_user("admin", "password123")
-divide_numbers(10, 0)  # Will cause ZeroDivisionError
-run_system_command("rm -rf /")  # Extreme danger (DO NOT RUN THIS)
-store_password("mypassword")
-decode_jwt("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30=")  # Insecure JWT usage
+def duplicate_function2(numbers):
+    total = 0
+    for num in numbers:
+        total += num
+    return total  # Duplicate of duplicate_function1()
+
+# Bug: Missing return statement
+def missing_return():
+    x = 5  # Function does not return anything, can cause issues
+
+# Run test cases
+if __name__ == "__main__":
+    print(divide_numbers(10, 0))  # This will cause a division by zero error
+    print(authenticate("admin", "wrongpassword"))
+    print(execute_command("2 + 2"))  # Dangerous eval execution
+    print(calculate_sum([1, 2, 3, 4, 5]))
+    print(process_data('{"value": 42}'))
+    print(duplicate_function1([10, 20, 30]))
+    print(duplicate_function2([10, 20, 30]))
